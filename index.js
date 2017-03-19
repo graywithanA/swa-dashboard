@@ -28,7 +28,6 @@ twilioConfig.receivingNumber = process.env.TWILIO_PHONE_TO;
 
 var requiredConfig = [twilioConfig.accountSid, twilioConfig.authToken, twilioConfig.sendingNumber, twilioConfig.receivingNumber];
 var isTwilioConfigured = requiredConfig.every(function(configValue) {
-  console.log(typeof configValue, configValue);
   return configValue || false;
 });
 
