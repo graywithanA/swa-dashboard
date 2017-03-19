@@ -6,6 +6,9 @@
   "bin": {
     "swa": "index.js"
   },
+  "scripts": {
+    "start": ". ./startApp.sh"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ezekg/swa-dashboard"
