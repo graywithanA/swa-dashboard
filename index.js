@@ -19,10 +19,23 @@ const TIME_HOUR = TIME_MIN * 60
 
 
 // Check if Twilio env vars are set
-const isTwilioConfigured = process.env.TWILIO_ACCOUNT_SID &&
-                           process.env.TWILIO_AUTH_TOKEN &&
-                           process.env.TWILIO_PHONE_FROM &&
-                           process.env.TWILIO_PHONE_TO
+const twilioConfig = {};
+twilioConfig.accountSid = process.env.TWILIO_ACCOUNT_SID;
+twilioConfig.authToken = process.env.TWILIO_AUTH_TOKEN;
+twilioConfig.sendingNumber = process.env.TWILIO_PHONE_FROM;
+twilioConfig.receivingNumber = process.env.TWILIO_PHONE_TO;
+
+var requiredConfig = [twilioConfig.accountSid, twilioConfig.authToken, twilioConfig.sendingNumber, twilioConfig.receivingNumber];
+var isTwilioConfigured = requiredConfig.every(function(configValue) {
+  console.log(typeof configValue, configValue);
+  return configValue || false;
+});
+
+if (!isTwilioConfigured) {
+  var errorMessage = 'TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_FROM and TWILIO_PHONE_TO must be set.';
+
+  throw new Error(errorMessage);
+}
 
 // Fares
 var prevLowestOutboundFare
@@ -386,21 +399,21 @@ waypoints.map(w => dashboard.waypoint(w))
  */
 const sendTextMessage = (message) => {
   try {
-    const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+    const twilioClient = twilio(twilioConfig.accountSid, twilioConfig.authToken)
 
     twilioClient.sendMessage({
-      from: process.env.TWILIO_PHONE_FROM,
-      to: process.env.TWILIO_PHONE_TO,
+      from: twilioConfig.sendingNumber,
+      to: twilioConfig.receivingNumber,
       body: message
     }, function(err, data) {
       if (!dashboard) return
       if (err) {
         dashboard.log([
-          chalk.red(`Error: failed to send SMS to ${process.env.TWILIO_PHONE_TO} from ${process.env.TWILIO_PHONE_FROM}`)
+          chalk.red(`Error: failed to send SMS to ${twilioConfig.receivingNumber} from ${twilioConfig.sendingNumber}`)
         ])
       } else {
         dashboard.log([
-          chalk.green(`Successfully sent SMS to ${process.env.TWILIO_PHONE_TO} from ${process.env.TWILIO_PHONE_FROM}`)
+          chalk.green(`Successfully sent SMS to ${twilioConfig.receivingNumber} from ${twilioConfig.sendingNumber}`)
         ])
       }
     })
@@ -601,7 +614,7 @@ dashboard.settings([
   `Interval: ${pretty(interval * TIME_MIN)}`,
   `Individual deal price: ${individualDealPrice ? `<= ${formatPrice(individualDealPrice)}` : "disabled"}`,
   !isOneWay && `Total deal price: ${totalDealPrice ? `<= ${formatPrice(totalDealPrice)}` : "disabled"}`,
-  `SMS alerts: ${isTwilioConfigured ? process.env.TWILIO_PHONE_TO : "disabled"}`,
+  `SMS alerts: ${isTwilioConfigured ? twilioConfig.receivingNumber : "disabled"}`,
   `Daily update: ${dailyUpdate ? dailyUpdateAt : "disabled"}`
 ].filter(s => s))
 
