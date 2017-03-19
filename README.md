@@ -1,21 +1,30 @@
 # SWA Dashboard
-Dashboard to monitor and receive alerts for changes in Southwest fare prices.
+Dashboard to monitor, log and receive alerts for changes in Southwest fare prices.
+
+This is my fork of [ezekg's project](https://github.com/ezekg/swa-dashboard).  This fork adds logging functionality which stores the price history in a CSV file.
+
+I also added an `npm start` script which will start the app using a bash script named `startApp.sh`.  The only reason I'm using the bash script is so I can store my Twilio account details in a file that I don't commit to the public repo.  The bash script simply sets the require environmental variables and starts the app.  This also avoids the `npm link` approach taken by the original author of this project.
 
 ![image](https://cloud.githubusercontent.com/assets/6979737/17744714/99f15da2-646e-11e6-8f13-60c716f1e865.png)
 
-## Why?
-I'm a lazy programmer who was tired of checking flight prices. ¯\\\_(ツ)\_/¯
-
-## Installation
-Since I would rather not get in trouble for publishing this tool to npm, you can
-clone the repo locally and use `npm link` to use the executable.
-```
-cd wherever-you-cloned-it-to
-npm link
-```
-
 ## Usage
-It will scrape Southwest's prices every `n` minutes (`n` = whatever interval you
+1. Run `npm install`.
+1. Create a file named `startApp.sh` in your project root.
+1. Copy the code below into `startApp.sh` and update the Twilio details and add the required/optional flags (see below) to the last line.
+
+```bash
+#!/usr/bin/env bash
+
+TWILIO_ACCOUNT_SID=<accountID> \
+TWILIO_AUTH_TOKEN=<authToken> \
+TWILIO_PHONE_FROM=<twilioPhoneNumber> \
+TWILIO_PHONE_TO=<receivingPhoneNumber> \
+node index.js <required&optionFlags>
+
+```
+
+### Flags aka Settings
+The app will scrape Southwest's prices every `n` minutes (`n` = whatever interval you
 define via the `--interval` flag) and compare the results, letting you know the
 difference in price since the last interval. The default interval is 30 mins and
 the default fare type is dollars.
@@ -69,13 +78,6 @@ When the Twilio environment variables are configured, you can also use the daily
 update flags `--daily-update` and `--daily-update-at` to send you a daily SMS
 message with the current fare prices. The `--daily-update-at` flag is in 24
 hour time format.
-
-```bash
-export TWILIO_ACCOUNT_SID=""
-export TWILIO_AUTH_TOKEN=""
-export TWILIO_PHONE_FROM=""
-export TWILIO_PHONE_TO=""
-```
 
 ## Troubleshooting
 
