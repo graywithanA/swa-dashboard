@@ -37,6 +37,15 @@ if (!isTwilioConfigured) {
   throw new Error(errorMessage);
 }
 
+// Check if log path is set
+const logFilePath = process.env.SWA_PRICES_LOG_PATH;
+
+if (!logFilePath) {
+  var errorMessage = 'SWA_PRICES_LOG_PATH must be set.';
+
+  throw new Error(errorMessage);
+}
+
 // Fares
 var prevLowestOutboundFare
 var prevLowestReturnFare
@@ -565,7 +574,7 @@ const fetch = () => {
             `Total for both flights is currently ${formatPrice(lowestOutboundFare + lowestReturnFare)}`
           ])
 
-          fs.appendFile('prices.csv', `${new Date()},${formatPrice(lowestOutboundFare)},${formatPrice(lowestReturnFare)},${formatPrice(lowestOutboundFare + lowestReturnFare)}\n`, (err) => {
+          fs.appendFile(logFilePath, `${new Date()},${formatPrice(lowestOutboundFare)},${formatPrice(lowestReturnFare)},${formatPrice(lowestOutboundFare + lowestReturnFare)}\n`, (err) => {
             if (err) {
               dashboard.log([
                 `Error logging last price updates to CSV file.`,

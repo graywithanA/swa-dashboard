@@ -19,6 +19,7 @@ TWILIO_ACCOUNT_SID=<accountID> \
 TWILIO_AUTH_TOKEN=<authToken> \
 TWILIO_PHONE_FROM=<twilioPhoneNumber> \
 TWILIO_PHONE_TO=<receivingPhoneNumber> \
+SWA_PRICES_LOG_PATH=<path/to/log.csv> \
 node index.js <required&optionFlags>
 
 ```
