@@ -10,6 +10,7 @@ const contrib = require("blessed-contrib")
 const format = require("date-format")
 const pretty = require("pretty-ms")
 const airports = require("airports")
+const fs = require('fs')
 
 // Time constants
 const TIME_MS = 1
@@ -564,6 +565,15 @@ const fetch = () => {
             `Lowest fare for a return flight is currently ${formatPrice([lowestReturnFare, returnFareDiffString].filter(i => i).join(" "))}`,
             `Total for both flights is currently ${formatPrice(lowestOutboundFare + lowestReturnFare)}`
           ])
+
+          fs.appendFile('prices.csv', `${new Date()},${formatPrice(lowestOutboundFare)},${formatPrice(lowestReturnFare)},${formatPrice(lowestOutboundFare + lowestReturnFare)}\n`, (err) => {
+            if (err) {
+              dashboard.log([
+                `Error logging last price updates to CSV file.`,
+                `${JSON.stringify(err, null, 2)}`
+              ])
+            }
+          })
         }
 
         dashboard.plot({
